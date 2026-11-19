@@ -85,6 +85,13 @@ if (!matched && !isILiveAlone && searchList.length > 0) {
                     .then(res => res.json())
                     .then(sources => {
                         const streams = [];
+                        const subtitles = isILiveAlone && Number(episodeNum) === 672
+    ? [{
+        url: "https://sub.cdnvideo11.shop/auto-upload/3701/672/feee2fc6d75fb729c397f5ece8388c92.en.srt",
+        language: "en",
+        name: "English"
+    }]
+    : [];
                         
                         // Proses link video
                         const links = [sources.Video, sources.ThirdParty].filter(l => l);
@@ -94,7 +101,7 @@ if (!matched && !isILiveAlone && searchList.length > 0) {
                                 streams.push({
                                     name: "Kisskh HLS",
                                     title: `Kisskh Stream`,
-                                    url: link,
+                                    url: link, subtitles,
                                     quality: "Auto",
                                     headers: { "Origin": MAIN_URL, "Referer": MAIN_URL },
                                     provider: "kisskh"
@@ -103,7 +110,7 @@ if (!matched && !isILiveAlone && searchList.length > 0) {
                                 streams.push({
                                     name: "Kisskh MP4",
                                     title: `Kisskh Stream`,
-                                    url: link,
+                                    url: link, subtitles,
                                     quality: "Auto", // Biasanya 720p/1080p
                                     headers: { "Referer": MAIN_URL },
                                     provider: "kisskh"
