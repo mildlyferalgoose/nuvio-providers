@@ -19,20 +19,27 @@ function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
             .then(tmdbData => {
                 const title = tmdbData.title || tmdbData.name || tmdbData.original_title;
                 const year = (tmdbData.release_date || tmdbData.first_air_date || "").substring(0, 4);
+                const isILiveAlone =
+    mediaType === "tv" &&
+    year === "2013" &&
+    /^(home alone|i live alone)$/i.test(title.trim());
+
+const searchTitle = isILiveAlone ? "I Live Alone" : title;
                 
                 // 1. Cari Drama di Kisskh
-                const searchUrl = `${MAIN_URL}/api/DramaList/Search?q=${encodeURIComponent(title)}&type=0`;
+                const searchUrl = `${MAIN_URL}/api/DramaList/Search?q=${encodeURIComponent(searchTitle)}&type=0`;
                 
                 return fetch(searchUrl)
                     .then(res => res.json())
                     .then(searchList => {
                         // Logika pencarian mirip Kotlin: Cek exact match, lalu fuzzy match
-                        let matched = searchList.find(item => item.title.toLowerCase() === title.toLowerCase());
-                        
-                        if (!matched && searchList.length > 0) {
-                             matched = searchList[0]; // Fallback ke hasil pertama
-                        }
+                        let matched = searchList.find(
+    item => item.title.trim().toLowerCase() === searchTitle.toLowerCase()
+);
 
+if (!matched && !isILiveAlone && searchList.length > 0) {
+    matched = searchList[0];
+}
                         if (!matched) throw new Error("Drama tidak ditemukan di Kisskh");
                         
                         return matched.id;
